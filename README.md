@@ -17,6 +17,6 @@ This Blazor Server application is designed to showcase a monolithic architecture
 ## Getting Started
 You will need the following tools:
 
-- Visual Studio 2021
-- .Net Core 7
-- PostgreSQL database server
+- **Visual Studio 2021**
+- **.Net Core 7**
+- **PostgreSQL database server**
