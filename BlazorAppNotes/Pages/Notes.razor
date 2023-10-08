@@ -1,0 +1,106 @@
+﻿@page "/"
+
+<div class="bg-secondary shadow">
+    <div class="row w-100">
+        <div class="col-3 px-5 py-4">
+            <NavLink class="nav-link" href="AddEmployee">
+                <span class="bg-light shadow px-1 py-2 border-0" style="color:grey" aria-hidden="true">New note</span>
+            </NavLink>
+        </div>
+        <div class="col-6 py-3">
+            <input @oninput="Search" style="width:100%" placeholder="Enter search term" class="bg-light shadow px-1 py-2 border-0"></input>
+        </div>
+        <div class="col-3 py-3">
+            <h6 class="text-center py-2">Total notes: @notes.Count()</h6>
+        </div>
+    </div>
+</div>
+
+
+@if (notes is null)
+{
+    <p><em>Loading... !</em></p>
+}
+else
+{
+    <div class="pb-5">
+        @foreach (var note in notes.OrderBy(u => u.Id))
+        {
+        
+            <div class="container shadow bg-light my-4">
+                <div class="row">
+                    <div class="col-1 text-center py-2">
+                        <h6 class="py-2">@note.Title</h6>
+                    </div>
+                    <div class="col-9 text-center">
+                        @Time(note.CreatedDate)
+                    </div>
+                    <div class="col-2">
+                        <div class="row text-center h-100">
+                            <div class="col-6 py-2">
+                                <button @onclick="@(()=>ShowContent(note.Id))" class="bg-primary-subtle px-1 py-2 border-0">
+                                    @if (IsView && Id == @note.Id)
+                                    {
+                                        <span>Hide note</span>
+                                    }
+                                    else
+                                    {
+                                        <span>View note</span>
+                                    }
+                                </button>
+                            </div>
+                            <div class="col-6 py-3">
+                                <a class="nav-link" href="EditNotes/@note.Id">
+                                    <span class="bg-primary-subtle px-1 py-2 border-0" aria-hidden="true">Edit note</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @if (IsView && Id == @note.Id)
+                {
+                    <div class="row p-4">
+                        <h6 class="bg-white py-2" style="overflow-wrap: break-word">@note.Content</h6>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<footer class="row w-100 m-0 bg-secondary text-center py-3 shadow" style="position:fixed;bottom:0;">
+    <span class="m-0">4Notes: anonymous notes sharing</span>
+</footer>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject]
+    public INoteRepository NoteRepos { get; set; }
+
+    List<Note> notes = new List<Note>();
+    public bool IsView = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        notes = await Task.Run(() => NoteRepos.GetAllAsync());
+    }
+
+    async Task Search(ChangeEventArgs args)
+    {
+        var searchTerm = (string)args.Value;
+        notes = await NoteRepos.SearchAsync(searchTerm);
+    }
+
+    void ShowContent(int id)
+    {
+        Id = id;
+        IsView = !IsView;
+        StateHasChanged();
+    }
+
+    public string Time(DateTime dateTime) => NoteRepos.TimeAgo(dateTime);
+}
+

@@ -1,0 +1,61 @@
+﻿@page "/AddEmployee"
+@inject INoteRepository noteRepos;
+@inject NavigationManager NavigationManager
+
+
+<div class="container w-50">
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-secondary border-0 bg-gradient ml-0 py-1">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="text-white py-3 m-0">Create Note</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body py-4">
+            <EditForm Model="@obj">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="border-top border-bottom p-3 m-0">
+                   
+                    <div class="form-floating py-3 col-12">
+                        <label for="Title" class="control-label">Title</label>
+                            <InputText @bind-Value="@obj.Title" class="form-control" id="Title"></InputText>
+                    </div>
+                    <div class="form-floating py-3 col-12">
+                        <label for="Content" class="control-label">Content</label>
+                            <InputText @bind-Value="@obj.Content" class="form-control" id="Content"></InputText>
+                    </div>
+                    
+
+                    <div class="row p-2">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-primary" @onclick="@CreateNote">Save</button>
+                            <button type="button" class="btn btn-primary" @onclick="@Cancel">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Note obj = new Note();
+
+    protected async void CreateNote()
+    {
+        if(obj.Title!= null && obj.Content!=null)
+        {
+            await noteRepos.CreateAsync(obj);
+            NavigationManager.NavigateTo("");
+        }
+    }
+
+
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("");
+    }
+}
